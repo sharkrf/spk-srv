@@ -58,7 +58,7 @@ func sendAnswer(udpConn *net.UDPConn, toAddr *net.UDPAddr, res *spkResponsePacke
 }
 
 func startSendAnswer(udpConn *net.UDPConn, toAddr net.UDPAddr, rp *spkRequestPacket) {
-	defer RequestRemove(rp.SessionID)
+	defer RequestRemove(rp.SessionID, &toAddr)
 
 	res := spkResponsePacket { PacketType: SPK_PACKET_TYPE_RESPONSE, SessionID: rp.SessionID }
 	copy(res.Magic[:], SPK_PACKET_MAGIC)
@@ -185,11 +185,11 @@ func processPacket(udpConn *net.UDPConn, fromAddr *net.UDPAddr, buffer []byte, r
 
 			rp.CodeStr[SPK_ANNOUNCE_DATA_MAX_LENGTH-1] = 0
 
-			if RequestIsAdded(rp.SessionID) {
+			if RequestIsAdded(rp.SessionID, fromAddr) {
 				//log.Printf("ignoring packet, request already under processing with sid:0x%.8x\n", rp.SessionID)
 				return
 			}
-			RequestAdd(rp.SessionID)
+			RequestAdd(rp.SessionID, fromAddr)
 
 			atStr, atdStr := decodeAnnounceTypeAndDataToStr(rp.AnnounceType, rp.AnnounceTypeData)
 			log.Printf("sending \"%s\" to %s (sid:0x%.8x t:%s con:%s at:%s %s)\n",

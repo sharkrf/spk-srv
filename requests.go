@@ -2,34 +2,40 @@ package main
 
 import (
 	"sync"
+	"net"
 )
 
-var requestSessionIDs []uint32
-var requestSessionIDsMutex = &sync.Mutex{}
+type requestSessionData struct {
+	sessionID uint32
+	fromAddr net.UDPAddr
+}
+var requestSessionDatas []requestSessionData
+var requestSessionDatasMutex = &sync.Mutex{}
 
-func RequestAdd(sessionID uint32) {
-	requestSessionIDsMutex.Lock()
-	requestSessionIDs = append(requestSessionIDs, sessionID)
-	requestSessionIDsMutex.Unlock()
+func RequestAdd(sessionID uint32, fromAddr *net.UDPAddr) {
+	requestSessionDatasMutex.Lock()
+	rsd := requestSessionData{sessionID, *fromAddr}
+	requestSessionDatas = append(requestSessionDatas, rsd)
+	requestSessionDatasMutex.Unlock()
 }
 
-func requestGetIndex(sessionID uint32) int {
-    for i, v := range requestSessionIDs {
-        if v == sessionID {
+func requestGetIndex(sessionID uint32, fromAddr *net.UDPAddr) int {
+    for i, v := range requestSessionDatas {
+        if v.sessionID == sessionID && v.fromAddr.String() == fromAddr.String() {
             return i
         }
     }
     return -1
 }
 
-func RequestIsAdded(sessionID uint32) bool {
-	requestSessionIDsMutex.Lock()
-	defer requestSessionIDsMutex.Unlock()
-	return requestGetIndex(sessionID) >= 0
+func RequestIsAdded(sessionID uint32, fromAddr *net.UDPAddr) bool {
+	requestSessionDatasMutex.Lock()
+	defer requestSessionDatasMutex.Unlock()
+	return requestGetIndex(sessionID, fromAddr) >= 0
 }
 
 // http://stackoverflow.com/questions/37334119/how-to-delete-an-element-from-array-in-golang
-func removeFromSlice(s []uint32, i int) []uint32 {
+func removeFromSlice(s []requestSessionData, i int) []requestSessionData {
 	if len(s) == 0 {
 		return s
 	}
@@ -37,8 +43,8 @@ func removeFromSlice(s []uint32, i int) []uint32 {
 	return s[:len(s)-1]
 }
 
-func RequestRemove(sessionID uint32) {
-	requestSessionIDsMutex.Lock()
-	requestSessionIDs = removeFromSlice(requestSessionIDs, requestGetIndex(sessionID))
-	requestSessionIDsMutex.Unlock()
+func RequestRemove(sessionID uint32, fromAddr *net.UDPAddr) {
+	requestSessionDatasMutex.Lock()
+	requestSessionDatas = removeFromSlice(requestSessionDatas, requestGetIndex(sessionID, fromAddr))
+	requestSessionDatasMutex.Unlock()
 }
