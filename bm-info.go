@@ -76,7 +76,7 @@ func BMGenerateCodeStrFromClientData(cd *bmClientData, sd *bmServerData) string 
 		}
 		for i := 0; i < len(cd.StaticSubscriptions); i++ {
 			if i > 0 {
-				stgStr += "AN"
+				stgStr += "ND"
 			}
 			tg := fmt.Sprintf("%d", cd.StaticSubscriptions[i].Talkgroup)
 			for j := 0; j < len(tg); j++ {
@@ -93,7 +93,7 @@ func BMGenerateCodeStrFromClientData(cd *bmClientData, sd *bmServerData) string 
 		}
 		for i := 0; i < len(cd.DynamicSubscriptions); i++ {
 			if i > 0 {
-				dtgStr += "AN"
+				dtgStr += "ND"
 			}
 			tg := fmt.Sprintf("%d", cd.DynamicSubscriptions[i].Talkgroup)
 			for j := 0; j < len(tg); j++ {

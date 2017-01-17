@@ -72,7 +72,7 @@ gen RO profile
 gen RY ready
 gen TG talkgroup
 gen GS talkgroups
-gen AN and
+gen ND and
 gen LK linked 0.3 0
 gen GR "group call"
 gen RI "private call"
