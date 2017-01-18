@@ -56,7 +56,6 @@ gen SR "shark r f"
 gen IP "i p"
 gen BM brandmeister
 gen DP "d m r plus"
-gen SR shark
 gen RM room 0.3 0
 gen CL client
 gen CD connected
