@@ -4,39 +4,40 @@ import (
 	"fmt"
 )
 
-const SPK_PACKET_MAGIC						= "SRFSPK"
+const SPK_PACKET_MAGIC										= "SRFSPK"
 
-const SPK_PACKET_TYPE_RESPONSE_TERMINATOR	= 0
-const SPK_PACKET_TYPE_RESPONSE				= 1
-const SPK_PACKET_TYPE_REQUEST				= 2
+const SPK_PACKET_TYPE_RESPONSE_TERMINATOR					= 0
+const SPK_PACKET_TYPE_RESPONSE								= 1
+const SPK_PACKET_TYPE_REQUEST								= 2
 type spkPacketType uint8
 
-const SPK_ANNOUNCE_TYPE_DEFAULT				= 0
-const SPK_ANNOUNCE_TYPE_CONNECTING			= 1
-const SPK_ANNOUNCE_TYPE_CONNECTED			= 2
-const SPK_ANNOUNCE_TYPE_STATUS				= 3
-const SPK_ANNOUNCE_TYPE_STARTUP				= 4
+const SPK_ANNOUNCE_TYPE_DEFAULT								= 0
+const SPK_ANNOUNCE_TYPE_CONNECTING							= 1
+const SPK_ANNOUNCE_TYPE_CONNECTED							= 2
+const SPK_ANNOUNCE_TYPE_STATUS								= 3
+const SPK_ANNOUNCE_TYPE_STARTUP								= 4
+const SPK_ANNOUNCE_TYPE_CONNECTED_BRANDMEISTER_SHORTENED	= 5
 type spkAnnounceType uint8
 
-const SPK_MODEM_MODE_DMR					= 2
-const SPK_MODEM_MODE_DSTAR					= 3
-const SPK_MODEM_MODE_C4FM					= 4
+const SPK_MODEM_MODE_DMR									= 2
+const SPK_MODEM_MODE_DSTAR									= 3
+const SPK_MODEM_MODE_C4FM									= 4
 type spkModemMode uint8
 
-const SPK_CONNECTOR_ID_UNKNOWN				= 0
-const SPK_CONNECTOR_ID_DMRPLUS				= 1
-const SPK_CONNECTOR_ID_HOMEBREW				= 2
-const SPK_CONNECTOR_ID_HOMEBREW_MMDVM		= 3
-const SPK_CONNECTOR_ID_DCS					= 4
-const SPK_CONNECTOR_ID_FCS					= 5
-const SPK_CONNECTOR_ID_SRFIPCONN_CLIENT		= 6
-const SPK_CONNECTOR_ID_SRFIPCONN_SERVER		= 7
-const SPK_CONNECTOR_ID_REF					= 8
-const SPK_CONNECTOR_ID_YSFREF				= 9
+const SPK_CONNECTOR_ID_UNKNOWN								= 0
+const SPK_CONNECTOR_ID_DMRPLUS								= 1
+const SPK_CONNECTOR_ID_HOMEBREW								= 2
+const SPK_CONNECTOR_ID_HOMEBREW_MMDVM						= 3
+const SPK_CONNECTOR_ID_DCS									= 4
+const SPK_CONNECTOR_ID_FCS									= 5
+const SPK_CONNECTOR_ID_SRFIPCONN_CLIENT						= 6
+const SPK_CONNECTOR_ID_SRFIPCONN_SERVER						= 7
+const SPK_CONNECTOR_ID_REF									= 8
+const SPK_CONNECTOR_ID_YSFREF								= 9
 type spkConnectorId uint8
 
-const SPK_ANNOUNCE_DATA_MAX_LENGTH			= 33
-const SPK_REQUEST_PACKET_SIZE				= 23 + SPK_ANNOUNCE_DATA_MAX_LENGTH
+const SPK_ANNOUNCE_DATA_MAX_LENGTH							= 33
+const SPK_REQUEST_PACKET_SIZE								= 23 + SPK_ANNOUNCE_DATA_MAX_LENGTH
 
 type spkRequestPacket struct {
 	Magic [6]byte
@@ -50,7 +51,7 @@ type spkRequestPacket struct {
 	CodeStr [SPK_ANNOUNCE_DATA_MAX_LENGTH]byte
 }
 
-const SPK_RESPONSE_PACKET_SIZE				= 41
+const SPK_RESPONSE_PACKET_SIZE								= 41
 
 type spkResponsePacket struct {
 	Magic [6]byte
@@ -77,6 +78,9 @@ func decodeAnnounceTypeAndDataToStr(at spkAnnounceType, atd [2]uint32) (string, 
 
 	switch (at) {
 		default:
+			res = "unknown"
+			resData = fmt.Sprintf("%.8x%.8x", atd[0], atd[1])
+		case SPK_ANNOUNCE_TYPE_DEFAULT:
 			res = "default"
 			resData = fmt.Sprintf("%.8x%.8x", atd[0], atd[1])
 		case SPK_ANNOUNCE_TYPE_CONNECTING:
@@ -84,6 +88,9 @@ func decodeAnnounceTypeAndDataToStr(at spkAnnounceType, atd [2]uint32) (string, 
 			resData = fmt.Sprintf("srv:%d.%d.%d.%d cid:%d", atd[0] >> 24, (atd[0] >> 16) & 0xff, (atd[0] >> 8) & 0xff, atd[0] & 0xff, atd[1])
 		case SPK_ANNOUNCE_TYPE_CONNECTED:
 			res = "connected"
+			resData = fmt.Sprintf("srv:%d.%d.%d.%d cid:%d", atd[0] >> 24, (atd[0] >> 16) & 0xff, (atd[0] >> 8) & 0xff, atd[0] & 0xff, atd[1])
+		case SPK_ANNOUNCE_TYPE_CONNECTED_BRANDMEISTER_SHORTENED:
+			res = "connected (bm shortened)"
 			resData = fmt.Sprintf("srv:%d.%d.%d.%d cid:%d", atd[0] >> 24, (atd[0] >> 16) & 0xff, (atd[0] >> 8) & 0xff, atd[0] & 0xff, atd[1])
 		case SPK_ANNOUNCE_TYPE_STATUS:
 			res = "status"

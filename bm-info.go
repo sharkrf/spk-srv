@@ -56,7 +56,7 @@ func BMGetClientData(clientId uint32, result *bmClientData, finished chan bool) 
 	}
 }
 
-func BMGenerateCodeStrFromClientData(cd *bmClientData, sd *bmServerData) string {
+func BMGenerateCodeStrFromClientData(cd *bmClientData, sd *bmServerData, shortened bool) string {
 	var networkIDStr string
 	var refStr string
 	var stgStr string
@@ -68,45 +68,47 @@ func BMGenerateCodeStrFromClientData(cd *bmClientData, sd *bmServerData) string 
 		}
 	}
 
-	if len(cd.StaticSubscriptions) > 0 {
-		if len(cd.StaticSubscriptions) == 1 {
-			stgStr = "LKSTTG"
-		} else {
-			stgStr = "LKSTGS"
-		}
-		for i := 0; i < len(cd.StaticSubscriptions); i++ {
-			if i > 0 {
-				stgStr += "ND"
+	if !shortened {
+		if len(cd.StaticSubscriptions) > 0 {
+			if len(cd.StaticSubscriptions) == 1 {
+				stgStr = "LKSTTG"
+			} else {
+				stgStr = "LKSTGS"
 			}
-			tg := fmt.Sprintf("%d", cd.StaticSubscriptions[i].Talkgroup)
-			for j := 0; j < len(tg); j++ {
-				stgStr += "0" + string(tg[j])
+			for i := 0; i < len(cd.StaticSubscriptions); i++ {
+				if i > 0 {
+					stgStr += "ND"
+				}
+				tg := fmt.Sprintf("%d", cd.StaticSubscriptions[i].Talkgroup)
+				for j := 0; j < len(tg); j++ {
+					stgStr += "0" + string(tg[j])
+				}
 			}
 		}
-	}
 
-	if len(cd.DynamicSubscriptions) > 0 {
-		if len(cd.DynamicSubscriptions) == 1 {
-			dtgStr = "LKDNTG"
-		} else {
-			dtgStr = "LKDNGS"
-		}
-		for i := 0; i < len(cd.DynamicSubscriptions); i++ {
-			if i > 0 {
-				dtgStr += "ND"
+		if len(cd.DynamicSubscriptions) > 0 {
+			if len(cd.DynamicSubscriptions) == 1 {
+				dtgStr = "LKDNTG"
+			} else {
+				dtgStr = "LKDNGS"
 			}
-			tg := fmt.Sprintf("%d", cd.DynamicSubscriptions[i].Talkgroup)
-			for j := 0; j < len(tg); j++ {
-				dtgStr += "0" + string(tg[j])
+			for i := 0; i < len(cd.DynamicSubscriptions); i++ {
+				if i > 0 {
+					dtgStr += "ND"
+				}
+				tg := fmt.Sprintf("%d", cd.DynamicSubscriptions[i].Talkgroup)
+				for j := 0; j < len(tg); j++ {
+					dtgStr += "0" + string(tg[j])
+				}
 			}
 		}
-	}
 
-	if cd.Reflector.Active != 4000 && cd.Reflector.Active != 0 {
-		refStr = "LKRF"
-		ref := fmt.Sprintf("%d", cd.Reflector.Active)
-		for i := 0; i < len(ref); i++ {
-			refStr += "0" + string(ref[i])
+		if cd.Reflector.Active != 4000 && cd.Reflector.Active != 0 {
+			refStr = "LKRF"
+			ref := fmt.Sprintf("%d", cd.Reflector.Active)
+			for i := 0; i < len(ref); i++ {
+				refStr += "0" + string(ref[i])
+			}
 		}
 	}
 

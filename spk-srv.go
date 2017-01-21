@@ -72,7 +72,10 @@ func startSendAnswer(udpConn *net.UDPConn, toAddr net.UDPAddr, rp *spkRequestPac
 	bmGetClientDataRunning := false
 	var bmGetClientDataResult bmClientData
 	var serverData bmServerData
-	if rp.ConnectorID == SPK_CONNECTOR_ID_HOMEBREW && (rp.AnnounceType == SPK_ANNOUNCE_TYPE_CONNECTED || rp.AnnounceType == SPK_ANNOUNCE_TYPE_STATUS) {
+	if rp.ConnectorID == SPK_CONNECTOR_ID_HOMEBREW &&
+		(rp.AnnounceType == SPK_ANNOUNCE_TYPE_CONNECTED || rp.AnnounceType == SPK_ANNOUNCE_TYPE_CONNECTED_BRANDMEISTER_SHORTENED ||
+			rp.AnnounceType == SPK_ANNOUNCE_TYPE_STATUS) {
+
 		serverIP := fmt.Sprintf("%d.%d.%d.%d", rp.AnnounceTypeData[0] >> 24, (rp.AnnounceTypeData[0] >> 16) & 0xff,
 			(rp.AnnounceTypeData[0] >> 8) & 0xff, rp.AnnounceTypeData[0] & 0xff)
 
@@ -92,7 +95,8 @@ func startSendAnswer(udpConn *net.UDPConn, toAddr net.UDPAddr, rp *spkRequestPac
 			select {
 				case finished := <- bmGetClientDataFinished:
 					if finished && codeStrPos < 4 {
-						codeStr = strings.Replace(codeStr, "HBSV", BMGenerateCodeStrFromClientData(&bmGetClientDataResult, &serverData), 1)
+						codeStr = strings.Replace(codeStr, "HBSV", BMGenerateCodeStrFromClientData(&bmGetClientDataResult, &serverData,
+							rp.AnnounceType == SPK_ANNOUNCE_TYPE_CONNECTED_BRANDMEISTER_SHORTENED), 1)
 						log.Printf("code str modified for %s to %s", toAddr.String(), codeStr)
 						bmGetClientDataRunning = false
 					}
