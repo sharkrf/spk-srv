@@ -34,6 +34,7 @@ const SPK_CONNECTOR_ID_SRFIPCONN_CLIENT						= 6
 const SPK_CONNECTOR_ID_SRFIPCONN_SERVER						= 7
 const SPK_CONNECTOR_ID_REF									= 8
 const SPK_CONNECTOR_ID_YSFREF								= 9
+const SPK_CONNECTOR_ID_NULL									= 10
 type spkConnectorId uint8
 
 const SPK_ANNOUNCE_DATA_MAX_LENGTH							= 33
@@ -113,6 +114,7 @@ func getConnectorIdNameStr(id spkConnectorId) string {
 		case SPK_CONNECTOR_ID_SRFIPCONN_SERVER: return "sfs"
 		case SPK_CONNECTOR_ID_REF: return "ref"
 		case SPK_CONNECTOR_ID_YSFREF: return "ysf"
+		case SPK_CONNECTOR_ID_NULL: return "nul"
 		default: return "unk"
 	}
 }
