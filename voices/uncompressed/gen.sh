@@ -5,7 +5,7 @@ gen() {
 #	pico2wave -w "$1 $2.wav" "$2"
 
 	echo "$2" | text2wave -o "$1 $2.wav"
-	sox "$1 $2.wav" outfile.wav trim =0.1 -0.1 vol 7 dB
+	sox "$1 $2.wav" outfile.wav trim =0.1 -0.1 vol 7 dB compand 0.3,1 30:-70,-30,-10 -7 -60 0.2
 	mv outfile.wav "$1 $2.wav"
 
 	# We take more params as pre-silence and post-silence
