@@ -76,6 +76,8 @@ gen LK linked 0.3 0
 gen GR "group call"
 gen RI "private call"
 gen RE "call routing is active" 0.3 0.3
+gen DT dot
+gen DR "i p address"
 
 for i in {B..Z}; do
 	gen "A$i" $i
