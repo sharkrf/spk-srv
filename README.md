@@ -5,8 +5,10 @@ requested with a request UDP packet.
 
 # Installing
 
+Make sure **go-bindata** is installed, otherwise go generate will fail.
+
 ```
-go get github.com/sharkrf/spk-srv
+go get -d github.com/sharkrf/spk-srv
 go generate github.com/sharkrf/spk-srv
 go install github.com/sharkrf/spk-srv
 ```
