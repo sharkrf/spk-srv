@@ -22,6 +22,7 @@ type spkAnnounceType uint8
 const SPK_MODEM_MODE_DMR									= 2
 const SPK_MODEM_MODE_DSTAR									= 3
 const SPK_MODEM_MODE_C4FM									= 4
+const SPK_MODEM_MODE_C4FM_HALF_DEVIATION					= 5
 type spkModemMode uint8
 
 const SPK_CONNECTOR_ID_UNKNOWN								= 0
@@ -69,6 +70,7 @@ func getModemModeNameStr(modemMode spkModemMode) string {
 		case SPK_MODEM_MODE_DMR: return "dmr"
 		case SPK_MODEM_MODE_DSTAR: return "dstar"
 		case SPK_MODEM_MODE_C4FM: return "c4fm"
+		case SPK_MODEM_MODE_C4FM_HALF_DEVIATION: return "c4fm-half"
 		default: return "unknown"
 	}
 }
