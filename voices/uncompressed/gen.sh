@@ -78,6 +78,7 @@ gen RI "private call"
 gen RE "call routing is active" 0.3 0.3
 gen DT dot
 gen DR "i p address"
+gen CP "access point"
 
 for i in {B..Z}; do
 	gen "A$i" $i
