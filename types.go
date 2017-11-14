@@ -14,9 +14,12 @@ type spkPacketType uint8
 const SPK_ANNOUNCE_TYPE_DEFAULT								= 0
 const SPK_ANNOUNCE_TYPE_CONNECTING							= 1
 const SPK_ANNOUNCE_TYPE_CONNECTED							= 2
-const SPK_ANNOUNCE_TYPE_STATUS								= 3
+const SPK_ANNOUNCE_TYPE_CONNECTOR_STATUS					= 3
 const SPK_ANNOUNCE_TYPE_STARTUP								= 4
 const SPK_ANNOUNCE_TYPE_CONNECTED_BRANDMEISTER_SHORTENED	= 5
+const SPK_ANNOUNCE_TYPE_DISCONNECTED						= 6
+const SPK_ANNOUNCE_TYPE_WIFI_DISCONNECTED					= 7
+const SPK_ANNOUNCE_TYPE_WIFI_CONNECTING						= 8
 type spkAnnounceType uint8
 
 const SPK_MODEM_MODE_DMR									= 2
@@ -95,11 +98,20 @@ func decodeAnnounceTypeAndDataToStr(at spkAnnounceType, atd [2]uint32) (string, 
 		case SPK_ANNOUNCE_TYPE_CONNECTED_BRANDMEISTER_SHORTENED:
 			res = "connected (bm shortened)"
 			resData = fmt.Sprintf("srv:%d.%d.%d.%d cid:%d", atd[0] >> 24, (atd[0] >> 16) & 0xff, (atd[0] >> 8) & 0xff, atd[0] & 0xff, atd[1])
-		case SPK_ANNOUNCE_TYPE_STATUS:
+		case SPK_ANNOUNCE_TYPE_CONNECTOR_STATUS:
 			res = "status"
 			resData = fmt.Sprintf("srv:%d.%d.%d.%d cid:%d", atd[0] >> 24, (atd[0] >> 16) & 0xff, (atd[0] >> 8) & 0xff, atd[0] & 0xff, atd[1])
 		case SPK_ANNOUNCE_TYPE_STARTUP:
 			res = "startup"
+			resData = fmt.Sprintf("%.8x%.8x", atd[0], atd[1])
+		case SPK_ANNOUNCE_TYPE_DISCONNECTED:
+			res = "disconnected"
+			resData = fmt.Sprintf("%.8x%.8x", atd[0], atd[1])
+		case SPK_ANNOUNCE_TYPE_WIFI_DISCONNECTED:
+			res = "wi-fi disconnected"
+			resData = fmt.Sprintf("%.8x%.8x", atd[0], atd[1])
+		case SPK_ANNOUNCE_TYPE_WIFI_CONNECTING:
+			res = "wi-fi connecting"
 			resData = fmt.Sprintf("%.8x%.8x", atd[0], atd[1])
 	}
 	return res, resData

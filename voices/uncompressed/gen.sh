@@ -79,6 +79,10 @@ gen RE "call routing is active" 0.3 0.3
 gen DT dot
 gen DR "i p address"
 gen CP "access point"
+gen WI "wai-fi"
+gen NE network
+gen IN internet
+gen UN "un reachable"
 
 for i in {B..Z}; do
 	gen "A$i" $i
