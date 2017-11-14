@@ -75,7 +75,7 @@ func startSendAnswer(udpConn *net.UDPConn, toAddr net.UDPAddr, rp *spkRequestPac
 	var serverData bmServerData
 	if rp.ConnectorID == SPK_CONNECTOR_ID_HOMEBREW &&
 		(rp.AnnounceType == SPK_ANNOUNCE_TYPE_CONNECTED || rp.AnnounceType == SPK_ANNOUNCE_TYPE_CONNECTED_BRANDMEISTER_SHORTENED ||
-			rp.AnnounceType == SPK_ANNOUNCE_TYPE_STATUS) {
+			rp.AnnounceType == SPK_ANNOUNCE_TYPE_CONNECTOR_STATUS) {
 
 		serverIP := fmt.Sprintf("%d.%d.%d.%d", rp.AnnounceTypeData[0] >> 24, (rp.AnnounceTypeData[0] >> 16) & 0xff,
 			(rp.AnnounceTypeData[0] >> 8) & 0xff, rp.AnnounceTypeData[0] & 0xff)
