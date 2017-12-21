@@ -83,6 +83,8 @@ gen WI "wai-fi"
 gen NE network
 gen IN internet
 gen UN "un reachable"
+gen SP special
+gen CE connector
 
 for i in {B..Z}; do
 	gen "A$i" $i
