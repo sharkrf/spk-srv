@@ -24,6 +24,7 @@ func getFilePathForCodePair(modemMode spkModemMode, codePair string) string {
 		case SPK_MODEM_MODE_DSTAR: dir = "voices/dstar/"
 		case SPK_MODEM_MODE_C4FM: dir = "voices/dmr/"
 		case SPK_MODEM_MODE_C4FM_HALF_DEVIATION: dir = "voices/dmr/"
+		case SPK_MODEM_MODE_NXDN: dir = "voices/dmr/"
 	}
 	if dir == "" {
 		return dir
@@ -184,6 +185,7 @@ func processPacket(udpConn *net.UDPConn, fromAddr *net.UDPAddr, buffer []byte, r
 				case SPK_MODEM_MODE_DSTAR: break
 				case SPK_MODEM_MODE_C4FM: break
 				case SPK_MODEM_MODE_C4FM_HALF_DEVIATION: break
+				case SPK_MODEM_MODE_NXDN: break
 				default:
 					log.Printf("ignoring packet, invalid modem mode %.2x\n", rp.ModemMode)
 					return
