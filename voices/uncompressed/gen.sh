@@ -85,6 +85,7 @@ gen IN internet
 gen UN "un reachable"
 gen SP special
 gen CE connector
+gen NX "n x d n"
 
 for i in {B..Z}; do
 	gen "A$i" $i
