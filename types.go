@@ -7,8 +7,9 @@ import (
 const SPK_PACKET_MAGIC										= "SRFSPK"
 
 const SPK_PACKET_TYPE_RESPONSE_TERMINATOR					= 0
-const SPK_PACKET_TYPE_RESPONSE								= 1
+const SPK_PACKET_TYPE_AMBE_RESPONSE							= 1
 const SPK_PACKET_TYPE_REQUEST								= 2
+const SPK_PACKET_TYPE_IMBE_RESPONSE							= 3
 type spkPacketType uint8
 
 const SPK_ANNOUNCE_TYPE_DEFAULT								= 0
@@ -58,16 +59,33 @@ type spkRequestPacket struct {
 	CodeStr [SPK_ANNOUNCE_DATA_MAX_LENGTH]byte
 }
 
-const SPK_RESPONSE_PACKET_SIZE								= 41
+const SPK_AMBE_RESPONSE_PACKET_SIZE							= 41
 
-type spkResponsePacket struct {
+type spkAMBEResponsePacket struct {
 	Magic [6]byte
 	Version uint8
 	PacketType spkPacketType
 	SessionID uint32
 	SeqNum uint8
-	AMBEFrameCount uint8
-	AMBEFrames [3][9]byte
+	FrameCount uint8
+	Frames [3][9]byte
+}
+
+const SPK_IMBE_RESPONSE_PACKET_SIZE							= 68
+
+type spkIMBEResponsePacket struct {
+	Magic [6]byte
+	Version uint8
+	PacketType spkPacketType
+	SessionID uint32
+	SeqNum uint8
+	FrameCount uint8
+	Frames [3][18]byte
+}
+
+type spkResponsePacket struct {
+	AMBE spkAMBEResponsePacket
+	IMBE spkIMBEResponsePacket
 }
 
 func getModemModeNameStr(modemMode spkModemMode) string {

@@ -1,4 +1,4 @@
-//go:generate go-bindata -nocompress voices/dmr voices/dstar
+//go:generate go-bindata -nocompress voices/dmr voices/dstar voices/p25
 
 package main
 
@@ -25,6 +25,7 @@ func getFilePathForCodePair(modemMode spkModemMode, codePair string) string {
 		case SPK_MODEM_MODE_C4FM: dir = "voices/dmr/"
 		case SPK_MODEM_MODE_C4FM_HALF_DEVIATION: dir = "voices/dmr/"
 		case SPK_MODEM_MODE_NXDN: dir = "voices/dmr/"
+		case SPK_MODEM_MODE_P25: dir = "voices/p25/"
 	}
 	if dir == "" {
 		return dir
@@ -45,25 +46,36 @@ func getFilePathForCodePair(modemMode spkModemMode, codePair string) string {
 	return ""
 }
 
-func sendAnswer(udpConn *net.UDPConn, toAddr *net.UDPAddr, res *spkResponsePacket) {
+func sendAMBEAnswer(udpConn *net.UDPConn, toAddr *net.UDPAddr, res *spkAMBEResponsePacket) {
 	var buf bytes.Buffer
 	binary.Write(&buf, binary.BigEndian, res)
 	writtenBytes, err := udpConn.WriteToUDP(buf.Bytes(), toAddr)
-	if writtenBytes != SPK_RESPONSE_PACKET_SIZE || err != nil {
+	if writtenBytes != SPK_AMBE_RESPONSE_PACKET_SIZE || err != nil {
 		log.Printf("warning: can't send udp packet to %s\n", toAddr.String())
 	}
 
 	if res.PacketType != SPK_PACKET_TYPE_RESPONSE_TERMINATOR {
 		res.SeqNum++
-		time.Sleep(time.Duration(res.AMBEFrameCount) * 20 * time.Millisecond)
+		time.Sleep(time.Duration(res.FrameCount) * 20 * time.Millisecond)
 	}
 }
 
-func startSendAnswer(udpConn *net.UDPConn, toAddr net.UDPAddr, rp *spkRequestPacket) {
-	defer RequestRemove(rp.SessionID, &toAddr)
+func sendIMBEAnswer(udpConn *net.UDPConn, toAddr *net.UDPAddr, res *spkIMBEResponsePacket) {
+	var buf bytes.Buffer
+	binary.Write(&buf, binary.BigEndian, res)
+	writtenBytes, err := udpConn.WriteToUDP(buf.Bytes(), toAddr)
+	if writtenBytes != SPK_IMBE_RESPONSE_PACKET_SIZE || err != nil {
+		log.Printf("warning: can't send udp packet to %s\n", toAddr.String())
+	}
 
-	res := spkResponsePacket { PacketType: SPK_PACKET_TYPE_RESPONSE, SessionID: rp.SessionID }
-	copy(res.Magic[:], SPK_PACKET_MAGIC)
+	if res.PacketType != SPK_PACKET_TYPE_RESPONSE_TERMINATOR {
+		res.SeqNum++
+		time.Sleep(time.Duration(res.FrameCount) * 20 * time.Millisecond)
+	}
+}
+
+func StartSendAnswer(udpConn *net.UDPConn, toAddr net.UDPAddr, rp *spkRequestPacket) {
+	defer RequestRemove(rp.SessionID, &toAddr)
 
 	codeStr := strings.TrimRight(string(rp.CodeStr[:]), "\x00")
 
@@ -89,6 +101,20 @@ func startSendAnswer(udpConn *net.UDPConn, toAddr net.UDPAddr, rp *spkRequestPac
 			bmGetClientDataRunning = true
 			go BMGetClientData(clientId, &bmGetClientDataResult, bmGetClientDataFinished)
 		}
+	}
+
+	var res spkResponsePacket
+	switch (rp.ModemMode) {
+		default:
+			copy(res.AMBE.Magic[:], SPK_PACKET_MAGIC)
+			res.AMBE.PacketType = SPK_PACKET_TYPE_AMBE_RESPONSE
+			res.AMBE.SessionID = rp.SessionID
+			break
+		case SPK_MODEM_MODE_P25:
+			copy(res.IMBE.Magic[:], SPK_PACKET_MAGIC)
+			res.IMBE.PacketType = SPK_PACKET_TYPE_IMBE_RESPONSE
+			res.IMBE.SessionID = rp.SessionID
+			break
 	}
 
 	// Stepping through each code char pair.
@@ -126,31 +152,58 @@ func startSendAnswer(udpConn *net.UDPConn, toAddr net.UDPAddr, rp *spkRequestPac
 			continue
 		}
 
-		//log.Printf("playing %s to %s\n", filePath, toAddr.String())
+		log.Printf("playing %s to %s\n", filePath, toAddr.String())
 
 		reader := bytes.NewReader(data)
-
 		var fileFinished = false
-		for !fileFinished {
-			// Filling up AMBEFrames from the file.
-			for ; res.AMBEFrameCount < 3; res.AMBEFrameCount++ {
-				readBytes, err := reader.Read(res.AMBEFrames[res.AMBEFrameCount][:])
-				if err != nil || readBytes != 9 {
-					fileFinished = true
-					break
-				}
-			}
 
-			// Flushing if needed.
-			if res.AMBEFrameCount == 3 {
-				sendAnswer(udpConn, &toAddr, &res)
-				res.AMBEFrameCount = 0
+		// Filling up frames from the file.
+		for !fileFinished {
+			switch (rp.ModemMode) {
+				default:
+					for ; res.AMBE.FrameCount < 3; res.AMBE.FrameCount++ {
+						readBytes, err := reader.Read(res.AMBE.Frames[res.AMBE.FrameCount][:])
+						if err != nil || readBytes != 9 {
+							fileFinished = true
+							break
+						}
+					}
+
+					// Flushing if needed.
+					if res.AMBE.FrameCount == 3 {
+						sendAMBEAnswer(udpConn, &toAddr, &res.AMBE)
+						res.AMBE.FrameCount = 0
+					}
+					break
+				case SPK_MODEM_MODE_P25:
+					for ; res.IMBE.FrameCount < 3; res.IMBE.FrameCount++ {
+						readBytes, err := reader.Read(res.IMBE.Frames[res.IMBE.FrameCount][:])
+						if err != nil || readBytes != 18 {
+							fileFinished = true
+							break
+						}
+					}
+
+					// Flushing if needed.
+					if res.IMBE.FrameCount == 3 {
+						sendIMBEAnswer(udpConn, &toAddr, &res.IMBE)
+						res.IMBE.FrameCount = 0
+					}
+					break
 			}
 		}
 	}
 
-	res.PacketType = SPK_PACKET_TYPE_RESPONSE_TERMINATOR
-	sendAnswer(udpConn, &toAddr, &res)
+	switch (rp.ModemMode) {
+		default:
+			res.AMBE.PacketType = SPK_PACKET_TYPE_RESPONSE_TERMINATOR
+			sendAMBEAnswer(udpConn, &toAddr, &res.AMBE)
+			break;
+		case SPK_MODEM_MODE_P25:
+			res.IMBE.PacketType = SPK_PACKET_TYPE_RESPONSE_TERMINATOR
+			sendIMBEAnswer(udpConn, &toAddr, &res.IMBE)
+			break
+	}
 
 	if bmGetClientDataRunning {
 		<- bmGetClientDataFinished
@@ -186,6 +239,7 @@ func processPacket(udpConn *net.UDPConn, fromAddr *net.UDPAddr, buffer []byte, r
 				case SPK_MODEM_MODE_C4FM: break
 				case SPK_MODEM_MODE_C4FM_HALF_DEVIATION: break
 				case SPK_MODEM_MODE_NXDN: break
+				case SPK_MODEM_MODE_P25: break
 				default:
 					log.Printf("ignoring packet, invalid modem mode %.2x\n", rp.ModemMode)
 					return
@@ -203,7 +257,7 @@ func processPacket(udpConn *net.UDPConn, fromAddr *net.UDPAddr, buffer []byte, r
 			log.Printf("sending \"%s\" to %s (sid:0x%.8x t:%s con:%s at:%s %s)\n",
 				strings.TrimRight(string(rp.CodeStr[:]), "\x00"), fromAddr.String(), rp.SessionID, getModemModeNameStr(rp.ModemMode),
 				getConnectorIdNameStr(rp.ConnectorID), atStr, atdStr);
-			go startSendAnswer(udpConn, *fromAddr, &rp)
+			go StartSendAnswer(udpConn, *fromAddr, &rp)
 	}
 }
 
