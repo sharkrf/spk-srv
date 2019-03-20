@@ -88,6 +88,7 @@ gen CE connector
 gen NX "n x d n"
 gen NF "not found."
 gen RQ "requested"
+gen P2 "p 25"
 
 for i in {B..Z}; do
 	gen "A$i" $i
