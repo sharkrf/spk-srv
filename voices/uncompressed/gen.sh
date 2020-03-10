@@ -93,6 +93,10 @@ gen N0 hundred
 gen BT battery
 gen RC percent
 gen CG charging
+gen TA ey
+gen TP p
+gen TM m
+gen TI "time is"
 
 for i in {B..Z}; do
 	gen "A$i" $i
