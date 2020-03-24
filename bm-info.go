@@ -87,12 +87,16 @@ func BMGenerateCodeStrFromClientData(cd *bmClientData, sd *bmServerData, shorten
 		}
 
 		if len(cd.DynamicSubscriptions) > 0 {
-			if len(cd.DynamicSubscriptions) == 1 {
-				dtgStr = "LKDNTG"
-			} else {
+			if len(cd.DynamicSubscriptions) > 1 {
 				dtgStr = "LKDNGS"
+			} else if cd.DynamicSubscriptions[0].Talkgroup != 4000 {
+				dtgStr = "LKDNTG"
 			}
 			for i := 0; i < len(cd.DynamicSubscriptions); i++ {
+				if cd.DynamicSubscriptions[i].Talkgroup == 4000 {
+					continue
+				}
+
 				if i > 0 {
 					dtgStr += "ND"
 				}
