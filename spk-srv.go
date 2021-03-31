@@ -274,10 +274,7 @@ func main() {
 	flag.BoolVar(&logToFile, "f", false, "log to file spk-srv.log")
 	flag.Parse()
 
-	if silent {
-		log.SetFlags(0)
-		log.SetOutput(ioutil.Discard)
-	} else if logToFile {
+	if logToFile && !silent {
 		logFile, err := os.OpenFile("spk-srv.log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 		if err != nil {
 			log.Println("warning: can't open spk-srv.log for writing: ", err)
@@ -287,7 +284,13 @@ func main() {
 		}
 	}
 
-	log.Printf("binding to %s:%d\n", bindIp, bindPort)
+	log.Printf("spk-srv start, binding to %s:%d\n", bindIp, bindPort)
+
+	if silent {
+		log.SetFlags(0)
+		log.SetOutput(ioutil.Discard)
+	}
+
 	udpConn, err := net.ListenUDP("udp4", &net.UDPAddr{ net.ParseIP(bindIp), bindPort, "" })
 	if err != nil {
 		log.Fatal(err)
