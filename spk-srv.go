@@ -14,6 +14,7 @@ import (
 	"os"
 	"time"
 	"fmt"
+	"io/ioutil"
 )
 
 func getFilePathForCodePair(modemMode spkModemMode, codePair string) string {
@@ -264,14 +265,19 @@ func processPacket(udpConn *net.UDPConn, fromAddr *net.UDPAddr, buffer []byte, r
 func main() {
 	var bindIp = "0.0.0.0"
 	var bindPort = 65200
+	var silent bool
 	var logToFile bool
 
 	flag.IntVar(&bindPort, "p", bindPort, "bind to port")
 	flag.StringVar(&bindIp, "i", bindIp, "bind to ip address")
+	flag.BoolVar(&silent, "s", false, "disable logging")
 	flag.BoolVar(&logToFile, "f", false, "log to file spk-srv.log")
 	flag.Parse()
 
-	if logToFile {
+	if silent {
+		log.SetFlags(0)
+		log.SetOutput(ioutil.Discard)
+	} else if logToFile {
 		logFile, err := os.OpenFile("spk-srv.log", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 		if err != nil {
 			log.Println("warning: can't open spk-srv.log for writing: ", err)
