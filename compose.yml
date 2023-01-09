@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      pull: true
+    image: docker.io/sharkrf/spk-srv
+    ports:
+      - 65200:65200/udp
+    command:
+      - -s
