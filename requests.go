@@ -1,14 +1,15 @@
 package main
 
 import (
-	"sync"
 	"net"
+	"sync"
 )
 
 type requestSessionData struct {
 	sessionID uint32
-	fromAddr net.UDPAddr
+	fromAddr  net.UDPAddr
 }
+
 var requestSessionDatas []requestSessionData
 var requestSessionDatasMutex = &sync.Mutex{}
 
@@ -20,12 +21,12 @@ func RequestAdd(sessionID uint32, fromAddr *net.UDPAddr) {
 }
 
 func requestGetIndex(sessionID uint32, fromAddr *net.UDPAddr) int {
-    for i, v := range requestSessionDatas {
-        if v.sessionID == sessionID && v.fromAddr.String() == fromAddr.String() {
-            return i
-        }
-    }
-    return -1
+	for i, v := range requestSessionDatas {
+		if v.sessionID == sessionID && v.fromAddr.String() == fromAddr.String() {
+			return i
+		}
+	}
+	return -1
 }
 
 func RequestIsAdded(sessionID uint32, fromAddr *net.UDPAddr) bool {

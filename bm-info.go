@@ -1,42 +1,38 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
 	"encoding/json"
-	"time"
+	"fmt"
 	"log"
 	"net"
-	"sync"
+	"net/http"
 	"strings"
+	"sync"
+	"time"
 )
 
 type bmServerData struct {
 	Network string
-	Name string
-	Host string
-}
-
-type bmReflectorData struct {
-	Active int
+	Name    string
+	Host    string
 }
 
 type bmSubscription struct {
-	Talkgroup int
+	Talkgroup string
 }
 
 type bmClientData struct {
-	Reflector bmReflectorData
-	StaticSubscriptions []bmSubscription
+	StaticSubscriptions  []bmSubscription
 	DynamicSubscriptions []bmSubscription
 }
 
 type bmServerIP string
+
 var bmServerIPHosts = make(map[bmServerIP]bmServerData)
 var bmServerIPHostsMutex = &sync.Mutex{}
 
 func getJson(url string, target interface{}) error {
-	var httpClient = &http.Client{ Timeout: 2000 * time.Millisecond }
+	var httpClient = &http.Client{Timeout: 2000 * time.Millisecond}
 	r, err := httpClient.Get(url)
 	if err != nil {
 		return err
@@ -47,7 +43,7 @@ func getJson(url string, target interface{}) error {
 }
 
 func BMGetClientData(clientId uint32, result *bmClientData, finished chan bool) {
-	url := fmt.Sprintf("https://api.brandmeister.network/v1.0/repeater/?action=PROFILE&q=%d", clientId)
+	url := fmt.Sprintf("https://api.brandmeister.network/v2/device/%d/profile", clientId)
 	err := getJson(url, result)
 	if err != nil {
 		log.Println("getjson error: ", err)
@@ -58,12 +54,11 @@ func BMGetClientData(clientId uint32, result *bmClientData, finished chan bool) 
 
 func BMGenerateCodeStrFromClientData(cd *bmClientData, sd *bmServerData, shortened bool) string {
 	var networkIDStr string
-	var refStr string
 	var stgStr string
 	var dtgStr string
 
 	if lastIndex := strings.LastIndex(sd.Name, "/"); lastIndex >= 0 {
-		for i := lastIndex+1; i < len(sd.Name); i++ {
+		for i := lastIndex + 1; i < len(sd.Name); i++ {
 			networkIDStr += "0" + string(sd.Name[i])
 		}
 	}
@@ -79,7 +74,7 @@ func BMGenerateCodeStrFromClientData(cd *bmClientData, sd *bmServerData, shorten
 				if i > 0 {
 					stgStr += "ND"
 				}
-				tg := fmt.Sprintf("%d", cd.StaticSubscriptions[i].Talkgroup)
+				tg := cd.StaticSubscriptions[i].Talkgroup
 				for j := 0; j < len(tg); j++ {
 					stgStr += "0" + string(tg[j])
 				}
@@ -89,34 +84,26 @@ func BMGenerateCodeStrFromClientData(cd *bmClientData, sd *bmServerData, shorten
 		if len(cd.DynamicSubscriptions) > 0 {
 			if len(cd.DynamicSubscriptions) > 1 {
 				dtgStr = "LKDNGS"
-			} else if cd.DynamicSubscriptions[0].Talkgroup != 4000 {
+			} else if cd.DynamicSubscriptions[0].Talkgroup != "4000" {
 				dtgStr = "LKDNTG"
 			}
 			for i := 0; i < len(cd.DynamicSubscriptions); i++ {
-				if cd.DynamicSubscriptions[i].Talkgroup == 4000 {
+				if cd.DynamicSubscriptions[i].Talkgroup == "4000" {
 					continue
 				}
 
 				if i > 0 {
 					dtgStr += "ND"
 				}
-				tg := fmt.Sprintf("%d", cd.DynamicSubscriptions[i].Talkgroup)
+				tg := cd.DynamicSubscriptions[i].Talkgroup
 				for j := 0; j < len(tg); j++ {
 					dtgStr += "0" + string(tg[j])
 				}
 			}
 		}
-
-		if cd.Reflector.Active != 4000 && cd.Reflector.Active != 0 {
-			refStr = "LKRF"
-			ref := fmt.Sprintf("%d", cd.Reflector.Active)
-			for i := 0; i < len(ref); i++ {
-				refStr += "0" + string(ref[i])
-			}
-		}
 	}
 
-	return "BM" + networkIDStr + stgStr + dtgStr + refStr
+	return "BM" + networkIDStr + stgStr + dtgStr
 }
 
 func BMGetServerDataForServerIP(addr string) (bmServerData, bool) {
