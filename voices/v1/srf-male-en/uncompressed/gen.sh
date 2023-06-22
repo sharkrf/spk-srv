@@ -99,6 +99,7 @@ gen TP p
 gen TM m
 gen TI "time is"
 gen TO oh
+gen BC broadcast
 
 for i in {B..Z}; do
 	gen "A$i" $i

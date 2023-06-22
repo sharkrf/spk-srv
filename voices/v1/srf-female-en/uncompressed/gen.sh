@@ -103,6 +103,7 @@ gen TP p &
 gen TM m &
 gen TI "time is" &
 gen TO oh &
+gen BC broadcast &
 wait
 
 for i in {B..Z}; do
