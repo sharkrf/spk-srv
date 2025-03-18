@@ -4,7 +4,7 @@ gen() {
 	echo "generating $1 $2.wav..."
 #	pico2wave -w "$1 $2.wav" "$2"
 
-	echo "$2" | text2wave -o "$1 $2.wav"
+	echo "$2" | text2wave -o "$1 $2.wav" -eval '(voice_cmu_us_slt_cg)'
 	tempfile="$(mktemp outfile.XXXXXXXXX.wav)"
 	sox "$1 $2.wav" $tempfile trim =0.1 -0.1 vol 7 dB compand 0.3,1 30:-70,-30,-10 -7 -60 0.2
 	mv $tempfile "$1 $2.wav"
@@ -104,6 +104,8 @@ gen TM m &
 gen TI "time is" &
 gen TO oh &
 gen BC broadcast &
+gen HS "allstarlink" &
+gen HI "iax2" &
 wait
 
 for i in {B..Z}; do
