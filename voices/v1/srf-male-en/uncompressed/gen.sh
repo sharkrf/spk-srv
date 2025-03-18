@@ -4,7 +4,7 @@ gen() {
 	echo "generating $1 $2.wav..."
 #	pico2wave -w "$1 $2.wav" "$2"
 
-	echo "$2" | text2wave -o "$1 $2.wav" -eval '(voice_cmu_us_rms_cg)'
+	echo "$2" | text2wave -o "$1 $2.wav" -eval '(voice_cmu_us_bdl_cg)'
 	tempfile="$(mktemp outfile.XXXXXXXXX.wav)"
 	sox "$1 $2.wav" $tempfile trim =0.1 -0.1 vol 7 dB 0.1
 	mv $tempfile "$1 $2.wav"
