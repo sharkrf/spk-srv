@@ -53,6 +53,7 @@ gen OM mike 0.5 0 &
 gen OS openspot 0.5 0 &
 gen CT "connected to" 0 0.2 &
 gen SV server &
+gen NO node
 gen HB homebrew &
 gen MM "m m d v m" &
 gen FC "f c s" &
