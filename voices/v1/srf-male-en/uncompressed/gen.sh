@@ -6,7 +6,7 @@ gen() {
 
 	echo "$2" | text2wave -o "$1 $2.wav" -eval '(voice_cmu_us_rms_cg)'
 	tempfile="$(mktemp outfile.XXXXXXXXX.wav)"
-	sox "$1 $2.wav" $tempfile trim =0.1 -0.1 vol 7 dB compand 0.3,1 30:-70,-30,-10 -7 -60 0.2
+	sox "$1 $2.wav" $tempfile trim =0.1 -0.1 vol 7 dB 0.1
 	mv $tempfile "$1 $2.wav"
 
 	# We take more params as pre-silence and post-silence
