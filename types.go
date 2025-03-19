@@ -50,6 +50,9 @@ const SPK_CONNECTOR_ID_SRFIPCONN_SERVER = 7
 const SPK_CONNECTOR_ID_REF = 8
 const SPK_CONNECTOR_ID_YSFREF = 9
 const SPK_CONNECTOR_ID_NULL = 10
+const SPK_CONNECTOR_ID_NXDNREF = 11
+const SPK_CONNECTOR_ID_BCAST = 12
+const SPK_CONNECTOR_ID_IAX2 = 13
 
 type spkConnectorId uint8
 
@@ -192,6 +195,12 @@ func getConnectorIdNameStr(id spkConnectorId) string {
 		return "ysf"
 	case SPK_CONNECTOR_ID_NULL:
 		return "nul"
+	case SPK_CONNECTOR_ID_NXDNREF:
+		return "nxd";
+	case SPK_CONNECTOR_ID_BCAST:
+		return "bca";
+	case SPK_CONNECTOR_ID_IAX2:
+		return "iax";
 	default:
 		return "unk"
 	}
