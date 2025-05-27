@@ -53,6 +53,7 @@ const SPK_CONNECTOR_ID_NULL = 10
 const SPK_CONNECTOR_ID_NXDNREF = 11
 const SPK_CONNECTOR_ID_BCAST = 12
 const SPK_CONNECTOR_ID_IAX2 = 13
+const SPK_CONNECTOR_ID_P25REF = 14
 
 type spkConnectorId uint8
 
@@ -201,6 +202,8 @@ func getConnectorIdNameStr(id spkConnectorId) string {
 		return "bca";
 	case SPK_CONNECTOR_ID_IAX2:
 		return "iax";
+	case SPK_CONNECTOR_ID_P25REF:
+		return "p25";
 	default:
 		return "unk"
 	}
