@@ -107,6 +107,7 @@ gen TO oh &
 gen BC broadcast &
 gen HS "allstarlink" &
 gen HI "iax2" &
+gen EL echolink &
 wait
 
 for i in {B..Z}; do
