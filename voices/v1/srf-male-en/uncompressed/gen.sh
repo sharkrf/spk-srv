@@ -108,6 +108,8 @@ gen BC broadcast &
 gen HS "allstarlink" &
 gen HI "iax2" &
 gen EL echolink &
+gen DS dash &
+gen SL slash &
 wait
 
 for i in {B..Z}; do
