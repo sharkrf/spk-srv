@@ -7,7 +7,6 @@ import (
 	"encoding/binary"
 	"flag"
 	"io"
-	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -18,7 +17,7 @@ import (
 func sendAMBEAnswer(udpConn *net.UDPConn, toAddr *net.UDPAddr, res *spkAMBEResponsePacket) {
 	var buf bytes.Buffer
 	if err := binary.Write(&buf, binary.BigEndian, res); err != nil {
-		log.Printf("send answer error: " + err.Error())
+		log.Printf("send answer error: %v", err)
 		return
 	}
 	writtenBytes, err := udpConn.WriteToUDP(buf.Bytes(), toAddr)
@@ -35,7 +34,7 @@ func sendAMBEAnswer(udpConn *net.UDPConn, toAddr *net.UDPAddr, res *spkAMBERespo
 func sendIMBEAnswer(udpConn *net.UDPConn, toAddr *net.UDPAddr, res *spkIMBEResponsePacket) {
 	var buf bytes.Buffer
 	if err := binary.Write(&buf, binary.BigEndian, res); err != nil {
-		log.Printf("send answer error: " + err.Error())
+		log.Printf("send answer error: %v", err)
 		return
 	}
 	writtenBytes, err := udpConn.WriteToUDP(buf.Bytes(), toAddr)
@@ -75,7 +74,7 @@ func main() {
 
 	if silent {
 		log.SetFlags(0)
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 	}
 
 	udpConn, err := net.ListenUDP("udp4", &net.UDPAddr{

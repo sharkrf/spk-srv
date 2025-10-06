@@ -1,3 +1,3 @@
 module github.com/sharkrf/spk-srv
 
-go 1.14
+go 1.25.1
