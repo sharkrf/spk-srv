@@ -49,7 +49,7 @@ func sendIMBEAnswer(udpConn *net.UDPConn, toAddr *net.UDPAddr, res *spkIMBERespo
 }
 
 func main() {
-	var bindIp = "0.0.0.0"
+	var bindIp = ""
 	var bindPort = 65200
 	var silent bool
 	var logToFile bool
@@ -77,7 +77,7 @@ func main() {
 		log.SetOutput(io.Discard)
 	}
 
-	udpConn, err := net.ListenUDP("udp4", &net.UDPAddr{
+	udpConn, err := net.ListenUDP("udp", &net.UDPAddr{
 		IP:   net.ParseIP(bindIp),
 		Port: bindPort,
 	})
